@@ -23,10 +23,11 @@ class Gestor_sonido:
             print(f"Error cargando audio: {e}")
             self.efectos = {}
 
-    def reproducir(self, nombre):
-        """Reproduce un sonido por su clave si existe"""
+    # reproduce solo si existe
+    def reproducir(self, nombre, volumen=0.1):
         sonido = self.efectos.get(nombre)
         if sonido:
+            sonido.set_volume(volumen)
             sonido.play()
 
     def musica_fondo(self, ruta, volumen=0.3):

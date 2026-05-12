@@ -1,4 +1,5 @@
 from dominio.jugador.jugador import Jugador, Stats
+from motor.sistema_combate import Combate
 
 
 class Asesino(Jugador):

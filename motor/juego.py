@@ -14,7 +14,6 @@ from dominio.mapa.mapa import Mapa
 from ui.renderizar import Renderizador
 from ui.hud import Hud
 from ui.menu import Menu
-from ui.outro import Outro
 
 # motor
 from motor.capturar_teclas import Capturar_teclas
