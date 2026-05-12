@@ -1,1 +1,2 @@
-pygame==2.6.1
+windows-curses; sys_platform == 'win32'
+pygame

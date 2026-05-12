@@ -1,98 +1,87 @@
-import pygame
-from ui.constantes import NEGRO, GRIS, BLANC, ROJO, VERDE, AMARIL
+import curses
+from ui.constantes import COLOR_TITULO, COLOR_STATS
 
-#  Menú de selección
 class Menu:
 
-    def __init__(self, pantalla):
-        self.pantalla      = pantalla
-        self.fuente_titulo = pygame.font.SysFont("monospace", 28, bold=True)
-        self.fuente_opcion = pygame.font.SysFont("monospace", 18)
+    def __init__(self, stdscr):
+        self.stdscr = stdscr
 
     def seleccion_clase(self) -> str:
+        # lista de opciones:
         opciones = [
-            ("1", "Guerrero", "Tanque resistente. Furia aumenta con el combate."),
-            ("2", "Asesino",  "Veloz y letal. Dash para reposicionarse."),
-            ("3", "Mago",     "Frágil pero poderoso. Spells a distancia."),
+            ('1', "guerrero", "Guerrero", "Tanque resistente. +vida + defensa."),
+            ('2', "asesino",  "Asesino",  "Veloz y letal, +crit +ataque."),
+            ('3', "mago",     "Mago",     "Frágil pero poderoso, ataque a distancia"),
         ]
 
         while True:
-            self.pantalla.fill(NEGRO)
-            titulo = self.fuente_titulo.render("Elegí tu clase", True, AMARIL)
-            self.pantalla.blit(titulo, (50, 60))
+            self.stdscr.erase()
+            vertical, horizontal = self.stdscr.getmaxyx()
 
-            for i, (tecla, nombre, descripcion) in enumerate(opciones):
-                y = 160 + i * 100
-                pygame.draw.rect(self.pantalla, GRIS,   (50, y, 700, 70))
-                pygame.draw.rect(self.pantalla, AMARIL, (50, y, 700, 70), 1)
-                self.pantalla.blit(
-                    self.fuente_opcion.render(f"[{tecla}]  {nombre}", True, AMARIL), (70, y + 10))
-                self.pantalla.blit(
-                    self.fuente_opcion.render(f"     {descripcion}", True, BLANC),   (70, y + 38))
+            # dibujar titulo centrado
+            titulo = "=== Elegí tu clase ==="
+            pos_horizontal_titulo = (horizontal // 2) - (len(titulo) // 2)
+            self.stdscr.addstr(2, pos_horizontal_titulo, titulo, curses.color_pair(COLOR_TITULO) | curses.A_BOLD)
 
-            pygame.display.flip()
+            # dibujar opciones
+            fila_actual = 6
+            for opcion in opciones:
+                tecla = opcion[0]
+                nombre = opcion[2]
+                desc = opcion[3]
 
-            for evento in pygame.event.get():
-                if evento.type == pygame.QUIT:
-                    pygame.quit()
-                    exit()
-                if evento.type == pygame.KEYDOWN:
-                    if evento.key == pygame.K_1: return "guerrero"
-                    if evento.key == pygame.K_2: return "asesino"
-                    if evento.key == pygame.K_3: return "mago"
+                # tecla y nombre
+                self.stdscr.addstr(fila_actual, 4, f"[{tecla}]  {nombre}", curses.color_pair(COLOR_TITULO))
+                #descripcion
+                self.stdscr.addstr(fila_actual + 1, 4, f"     {desc}")
+
+                # aumentamos espacio para siguiente opcion
+                fila_actual = fila_actual + 3
+
+            self.stdscr.refresh()
+
+            # caputrar tecla
+            tecla_presionada = self.stdscr.getch()
+
+            if tecla_presionada == ord('1'):
+                return "guerrero"
+            if tecla_presionada == ord('2'):
+                return "asesino"
+            if tecla_presionada == ord('3'):
+                return "mago"
 
     def pantalla_game_over(self, jugador) -> bool:
-        """Muestra game over. Devuelve True si quiere jugar de nuevo, False si sale."""
-        fuente_titulo = pygame.font.SysFont("monospace", 36, bold=True)
-        fuente_opcion = pygame.font.SysFont("monospace", 18)
-        fuente_stats  = pygame.font.SysFont("monospace", 14)
-
-        ROJO   = (200, 50,  50)
-        AMARIL = (200, 200, 50)
-        BLANC  = (200, 200, 200)
-        GRIS   = (50,  50,  50)
-        NEGRO  = (0,   0,   0)
-
         while True:
-            self.pantalla.fill(NEGRO)
+            self.stdscr.erase()
+            vertical, horizontal = self.stdscr.getmaxyx()
 
-            # titulo
-            titulo = fuente_titulo.render("HAS MUERTO", True, ROJO)
-            self.pantalla.blit(titulo, (ANCHO_VENTANA // 2 - titulo.get_width() // 2, 80))
+            titulo = "HAS MUERTO"
+            pos_horizontal_titulo = (horizontal // 2) - (len(titulo) // 2)
+            self.stdscr.addstr(3, pos_horizontal_titulo, titulo, curses.color_pair(1) | curses.A_BOLD)
 
-            # stats finales
             stats = [
-                f"Clase     : {jugador.nombre}",
-                f"Nivel     : {jugador.nivel}",
-                f"Oro       : {jugador.oro}",
+                f"Clase      : {jugador.nombre}",
+                f"Nivel      : {jugador.nivel}",
+                f"Oro        : {jugador.oro}",
                 f"Experiencia: {jugador.experiencia}",
             ]
-            y = 180
+
+            # dibujar stats
+            fila_stats = 6
             for linea in stats:
-                sup = fuente_stats.render(linea, True, BLANC)
-                self.pantalla.blit(sup, (ANCHO_VENTANA // 2 - sup.get_width() // 2, y))
-                y += 24
+                pos_horizontal_linea = (horizontal // 2) - (len(linea) // 2)
+                self.stdscr.addstr(fila_stats, pos_horizontal_linea, linea)
+                # espacio entre stats
+                fila_stats = fila_stats + 1
 
-            # opciones
-            opciones = [
-                ("R", "Jugar de nuevo"),
-                ("Q", "Salir"),
-            ]
-            y = 340
-            for tecla, texto in opciones:
-                pygame.draw.rect(self.pantalla, GRIS,
-                                 (ANCHO_VENTANA // 2 - 150, y, 300, 50))
-                pygame.draw.rect(self.pantalla, AMARIL,
-                                 (ANCHO_VENTANA // 2 - 150, y, 300, 50), 1)
-                sup = fuente_opcion.render(f"[{tecla}]  {texto}", True, AMARIL)
-                self.pantalla.blit(sup, (ANCHO_VENTANA // 2 - sup.get_width() // 2, y + 14))
-                y += 70
+            # dibujar opciones para rejugar o salir
+            opciones_txt = "Presiona cualquier tecla para salir"
+            pos_horizontal_opc = (horizontal // 2) - (len(opciones_txt) // 2)
+            self.stdscr.addstr(12, pos_horizontal_opc, opciones_txt, curses.color_pair(COLOR_TITULO))
 
-            pygame.display.flip()
+            self.stdscr.refresh()
 
-            for evento in pygame.event.get():
-                if evento.type == pygame.QUIT:
-                    return False
-                if evento.type == pygame.KEYDOWN:
-                    if evento.key == pygame.K_r: return True
-                    if evento.key == pygame.K_q: return False
+            tecla_presionada = self.stdscr.getch()
+
+            if tecla_presionada:
+                return False
