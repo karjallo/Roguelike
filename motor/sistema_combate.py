@@ -2,14 +2,7 @@ from random import randint
 
 
 class Combate:
-    """
-    Centraliza toda la resolución de combate.
-    Recibe atacante y objetivo, calcula qué pasó, y retorna un diccionario de resultado.
-    No sabe nada de UI ni de sonido; solo produce datos.
-    """
 
-    PROB_CRITICO_PIERCE = 15   # % con pierce activo
-    PROB_CRITICO_NORMAL = 10   # % sin pierce
     MULTIPLICADOR_CRITICO = 1.5
 
     @staticmethod

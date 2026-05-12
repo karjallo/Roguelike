@@ -2,10 +2,6 @@ import curses
 
 
 class Capturar_teclas:
-    """
-    Responsabilidad: traducir teclas crudas de curses en intenciones del jugador.
-    Vive en motor/ porque interpreta lógica de juego, no dibuja nada.
-    """
 
     # Teclas de movimiento y su delta (fila, columna)
     TECLAS_MOVIMIENTO = {

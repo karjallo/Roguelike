@@ -29,7 +29,7 @@ class Gestor_sonido:
         if sonido:
             sonido.play()
 
-    def musica_fondo(self, ruta, volumen=0.5):
+    def musica_fondo(self, ruta, volumen=0.3):
         try:
             pygame.mixer.music.load(ruta)
             pygame.mixer.music.set_volume(volumen)
